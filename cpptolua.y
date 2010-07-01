@@ -59,8 +59,8 @@ class:
 			     	className = class_name;
 			     else className = $2->vs[0].c_str();
 
-				 $$ = className;
-			     printf("ClassName: %s\n", className);
+				 //$$ = className;
+			     //printf("ClassName: %s\n", className);
 			     for(int i=0; i<$5->vi.size(); i++)
 			     {
 			         string type = $5->vi[i].type;
@@ -115,14 +115,14 @@ class:
 	;
 
 directive_list_opt:
-					'#' IDF directive_param_opt { $$ = $2; }
-					| { $$ = ""; }
+					'#' IDF directive_param_opt { /*$$ = $2;*/ }
+					| { /*$$ = "";*/ }
 					;
 
 directive_param_opt:
-					'<' IDF '>' { $$ = $2; }
-					| IDF { $$ = ""; }
-					| { $$ = ""; }
+					'<' IDF '>' { /*$$ = $2;*/ }
+					| IDF { /*$$ = "";*/ }
+					| { /*$$ = "";*/ }
 					;
 
 class_body:
@@ -169,7 +169,8 @@ function:
 				   $$->name = $1->vs[$1->vs.size()-1];
 				   //for(int i=0; i<$1->vs.size(); i++)
 				   //  printf("%s ", $1->vs[i].c_str());
-				   vector<Idf> vp;			     printf("ClassName: %s\n", $2->vs[0].c_str());
+				   vector<Idf> vp;			    
+					 //printf("ClassName: %s\n", $1->vs[0].c_str());
 				   for(int i=0; i<$3->vvs.size(); i++)
 			   	   {
 			   	 	  Idf p;
