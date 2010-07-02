@@ -65,8 +65,11 @@ class:
 			     {
 			         string type = $5->vi[i].type;
 			         string fooName = $5->vi[i].name;
-			         if(type == "Constructor"
-			         	|| fooName == "" /*caso seja um enum*/
+			         if(type == "Constructor") {
+					printf("Heres a constructor");
+				 }
+
+			         if ( fooName == "" /*caso seja um enum*/
 			         	//|| fooName.find("operator") != string::npos /*caso seja um operator*/
 			         	|| fooName.substr(0, strlen("operator")) == "operator" /*caso seja um operator*/
 			         	|| !$5->vi[i].isPublic /* caso nao seja publico */)
