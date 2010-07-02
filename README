@@ -1,0 +1,4 @@
+A solution to parse your cpp classes and generate instant bindings for them to be
+manipulated inside Lua scripts
+
+Under development, it barely works
