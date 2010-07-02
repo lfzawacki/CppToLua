@@ -268,10 +268,11 @@ void writeFunctionNames()
 
 int main(int argc, char **argv)
 {
-	if(argc == 2) {
-		//class_name_received = true;
-		//class_name = argv[1];
-	}
+	if(argc < 2) {
+        printf("\tusage: ./cpptolua [.h file] <options>\n");       
+        exit(0);
+    }
+
 	yyparse();
     writeFunctionNames();
 	return 0;
