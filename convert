@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#gets the name of an .h and makes the magic happen
+
+if [ -e cpptolua ]
+then
+	FILENAME=`echo $1 | cut -d "." -f 1`_userdata.cpp
+
+	./cpptolua < $1 > $FILENAME
+        #TODO generate .h
+	echo "I should generate a .h here"
+else
+	echo "Compile it first, remeber you need bison and flex"
+fi
