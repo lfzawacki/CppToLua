@@ -5,8 +5,8 @@ PROG = cpptolua
 CC = g++
 
 all: $(PROG)
-	./$(PROG) < in.cpp
-	./$(PROG) < player.h
+	#./$(PROG) < in.cpp
+	#./$(PROG) < player.h
 
 $(PROG): y.tab.c lex.yy.c
 	$(CC) $^ -o $@

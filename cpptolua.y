@@ -65,9 +65,26 @@ class:
 			     {
 			         string type = $5->vi[i].type;
 			         string fooName = $5->vi[i].name;
+                     string structor = fooName[0] == '~' ? "de" : "con";
+
 			         if(type == "Constructor") {
-					printf("Heres a constructor");
-				 }
+
+                        const char* cnc = className.c_str();
+
+                        printf( "int %s_new(lua_state* L) {\n\
+\tsize_t size = sizeof(%s);\n\
+\t%s *p = (%s*) lua_newuserdata(L, size);\
+\tluaL_getmetatable(L, \"%s\");\n\
+\tlua_setmetatable(L, -2);\n\
+}\n",cnc,cnc,cnc,cnc,cnc);
+	
+	return 1;
+
+                        printf("Heres a %sstructor %s\n",structor.c_str(),fooName.c_str());       
+	
+                        continue;
+
+				     }
 
 			         if ( fooName == "" /*caso seja um enum*/
 			         	//|| fooName.find("operator") != string::npos /*caso seja um operator*/
@@ -95,7 +112,7 @@ class:
 					 //problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
 					 //devem ser tratadas com pushlightuserdata. Como fazer????
 
-					 printf("c->			;%s(", fooName.c_str());
+					 printf("c->%s(", fooName.c_str());
 					 for(int j=0; j<$5->vi[i].param.size(); j++)
 					 {
 					    if(j>0) printf(", ");
