@@ -20,6 +20,8 @@ bool member_scope_public = false;
 bool class_name_received = false;
 string class_name;
 
+vector<string> functionNames;
+
 %}
 
 
@@ -65,34 +67,45 @@ class:
 			     {
 			         string type = $5->vi[i].type;
 			         string fooName = $5->vi[i].name;
-                     string structor = fooName[0] == '~' ? "de" : "con";
 
-			         if(type == "Constructor") {
+                     char func[256];
+
+			         if(type == "Constructor") { 
+                     /* um construtor */
+
+                     if (fooName[0] != '~')
+                        continue;
 
                         const char* cnc = className.c_str();
 
-                        printf( "int %s_new(lua_state* L) {\n\
-\tsize_t size = sizeof(%s);\n\
-\t%s *p = (%s*) lua_newuserdata(L, size);\
-\tluaL_getmetatable(L, \"%s\");\n\
-\tlua_setmetatable(L, -2);\n\
-}\n",cnc,cnc,cnc,cnc,cnc);
-	
-	return 1;
-
-                        printf("Heres a %sstructor %s\n",structor.c_str(),fooName.c_str());       
-	
+                        printf( "int %s_new(lua_state* L) {\n",cnc);
+                        printf( "\tsize_t size = sizeof(%s);\n",cnc);
+                        printf( "\t%s *p = (%s*) lua_newuserdata(L, size);\n",cnc,cnc);
+                        printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
+                        printf( "\tlua_setmetatable(L, -2);\n");
+                        printf( "\treturn 1;\n}\n");
                         continue;
-
 				     }
 
-			         if ( fooName == "" /*caso seja um enum*/
-			         	//|| fooName.find("operator") != string::npos /*caso seja um operator*/
-			         	|| fooName.substr(0, strlen("operator")) == "operator" /*caso seja um operator*/
-			         	|| !$5->vi[i].isPublic /* caso nao seja publico */)
-			         	continue;
+			         if ( fooName == "") {
+                        /*caso seja um enum*/ 
+                        continue;
+                     } 
 
-                     printf("int %s_%s(lua_State* L) {\n", className.c_str(), fooName.c_str());
+                     if (fooName.substr(0, strlen("operator")) == "operator") {
+                        /*caso seja um operator*/                        
+                        continue;
+                     } 
+			         
+                     if (!$5->vi[i].isPublic) {
+                        /* caso nao seja publico */ 
+                        continue;
+                     }
+			         	
+                     sscanf(func,"%s_%s",className.c_str(), fooName.c_str());
+                     functionNames.push_back(string(func));
+                     
+                     printf("int %s(lua_State* L) {\n",func);
 					 printf("\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 					 for(int j=0; j<$5->vi[i].param.size(); j++)
 					 {			;
