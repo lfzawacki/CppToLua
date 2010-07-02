@@ -262,7 +262,7 @@ void writeFunctionNames()
     printf("\tlua_settable(L, -3);\n");
     printf("\tluaL_openlib(L, NULL, %s_meta, 0);\n",c);
     printf("\tluaL_openlib(L, \"%s\", %slib, 0);\n",c,c);
-    printf("return 1;\n}\n");
+    printf("\treturn 1;\n}\n");
 
 }
 
