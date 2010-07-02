@@ -256,12 +256,12 @@ void writeFunctionNames()
     printf("\t%s\n};\n\n",nullnull);
 
     printf("int luaopen_%s(lua_State *L) {\n",c);
-    printf("\tluaL_newmetatable(L, \"%s\")",c);
-    printf("\tlua_pushstring(L, \"__index\");");
-    printf("\tlua_pushvalue(L, -2);");
-    printf("\tlua_settable(L, -3);");
-    printf("\tluaL_openlib(L, NULL, %s_meta, 0);",c);
-    printf("\tluaL_openlib(L, \"%s\", %slib, 0);",c,c);
+    printf("\tluaL_newmetatable(L, \"%s\")\n",c);
+    printf("\tlua_pushstring(L, \"__index\");\n");
+    printf("\tlua_pushvalue(L, -2);\n");
+    printf("\tlua_settable(L, -3);\n");
+    printf("\tluaL_openlib(L, NULL, %s_meta, 0);\n",c);
+    printf("\tluaL_openlib(L, \"%s\", %slib, 0);\n",c,c);
     printf("return 1;\n}\n");
 
 }
