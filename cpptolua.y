@@ -17,8 +17,8 @@ void yyerror(char *);
 /* if the member has public scope */
 bool member_scope_public = false;
 
-bool class_name_received = false;
-string class_name;
+/* there should be only one class per file */
+string global_class_name = "";
 
 vector<string> functionNames;
 
@@ -56,10 +56,11 @@ program:
 class:
 			 CLASS IDF hierarchy_opt '{' class_body '}' ';'
 			 {
-				 string className = "";
-			     if(class_name_received)
-			     	className = class_name;
-			     else className = $2->vs[0].c_str();
+				 
+			     string className = $2->vs[0].c_str();
+
+                 if (global_class_name.empty())
+                    global_class_name = className;
 
 				 //$$ = className;
 			     //printf("ClassName: %s\n", className);
@@ -67,8 +68,6 @@ class:
 			     {
 			         string type = $5->vi[i].type;
 			         string fooName = $5->vi[i].name;
-
-                     char func[256];
 
 			         if(type == "Constructor") { 
                      /* um construtor */
@@ -101,11 +100,10 @@ class:
                         /* caso nao seja publico */ 
                         continue;
                      }
-			         	
-                     sscanf(func,"%s_%s",className.c_str(), fooName.c_str());
-                     functionNames.push_back(string(func));
+			         
+                     functionNames.push_back(fooName);
                      
-                     printf("int %s(lua_State* L) {\n",func);
+                     printf("int %s_%s(lua_State* L) {\n",className.c_str(), fooName.c_str() );
 					 printf("\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 					 for(int j=0; j<$5->vi[i].param.size(); j++)
 					 {			;
@@ -241,13 +239,43 @@ block:
 %%
 
 
+void writeFunctionNames()
+{
+
+    const char* nullnull = "{NULL,NULL}";
+    const char* c = global_class_name.c_str();
+    printf("const struct luaL_reg %slib [] = {\n",c);
+    printf("\t{\"new\", %s_new },\n",c);
+    printf("\t%s\n};\n",nullnull);
+
+    printf("static const luaL_reg %s_meta[] = {\n",c);
+        vector<string>::iterator i;      
+        for (i = functionNames.begin(); i != functionNames.end(); i++ ) {
+            printf("\t{ \"%s\" , %s_%s }\n", i->c_str(), c,i->c_str() );        
+        }
+    printf("\t%s\n};\n\n",nullnull);
+
+//    int luaopen_player(lua_State *L) {
+//      luaL_newmetatable(L, "player");
+//      lua_pushstring(L, "__index");
+//      lua_pushvalue(L, -2);  /* pushes the metatable */
+//      lua_settable(L, -3);  /* metatable.__index = metatable */
+//      luaL_openlib(L, NULL, player_meta, 0);
+//      luaL_openlib(L, "player", playerlib, 0);
+
+//      return 1;
+//    }
+
+}
+
 int main(int argc, char **argv)
 {
 	if(argc == 2) {
-		class_name_received = true;
-		class_name = argv[1];
+		//class_name_received = true;
+		//class_name = argv[1];
 	}
 	yyparse();
+    writeFunctionNames();
 	return 0;
 }
 
