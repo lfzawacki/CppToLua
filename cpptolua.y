@@ -255,16 +255,14 @@ void writeFunctionNames()
         }
     printf("\t%s\n};\n\n",nullnull);
 
-//    int luaopen_player(lua_State *L) {
-//      luaL_newmetatable(L, "player");
-//      lua_pushstring(L, "__index");
-//      lua_pushvalue(L, -2);  /* pushes the metatable */
-//      lua_settable(L, -3);  /* metatable.__index = metatable */
-//      luaL_openlib(L, NULL, player_meta, 0);
-//      luaL_openlib(L, "player", playerlib, 0);
-
-//      return 1;
-//    }
+    printf("int luaopen_%s(lua_State *L) {\n",c);
+    printf("\tluaL_newmetatable(L, \"%s\")",c);
+    printf("\tlua_pushstring(L, \"__index\");");
+    printf("\tlua_pushvalue(L, -2);");
+    printf("\tlua_settable(L, -3);");
+    printf("\tluaL_openlib(L, NULL, %s_meta, 0);",c);
+    printf("\tluaL_openlib(L, \"%s\", %slib, 0);",c,c);
+    printf("return 1;\n}\n");
 
 }
 
