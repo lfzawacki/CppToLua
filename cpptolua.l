@@ -10,7 +10,7 @@
 
 %%
 
-"class" { printf("class\n"); return CLASS; }
+"class" { return CLASS; }
 [{};(),:] {
 	yylval.s = strdup(yytext);
 #ifdef DEBUG

@@ -70,14 +70,14 @@ class:
 			         string fooName = $5->vi[i].name;
 
 			         if(type == "Constructor") {
-                     /* um construtor */
+                     	/* um construtor */
 
                      if (fooName[0] != '~')
                         continue;
 
                         const char* cnc = className.c_str();
 
-                        printf( "int %s_new(lua_state* L) {\n",cnc);
+                        printf( "int %s_new(lua_State* L) {\n",cnc);
                         printf( "\tsize_t size = sizeof(%s);\n",cnc);
                         printf( "\t%s *p = (%s*) lua_newuserdata(L, size);\n",cnc,cnc);
                         printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
@@ -253,7 +253,7 @@ void writeFunctionNames()
     printf("static const luaL_reg %s_meta[] = {\n",c);
         vector<string>::iterator i;
         for (i = functionNames.begin(); i != functionNames.end(); i++ ) {
-            printf("\t{ \"%s\" , %s_%s }\n", i->c_str(), c,i->c_str() );
+            printf("\t{ \"%s\" , %s_%s },\n", i->c_str(), c,i->c_str() );
         }
     printf("\t%s\n};\n\n",nullnull);
 

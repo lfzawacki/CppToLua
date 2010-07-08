@@ -1,12 +1,22 @@
 #ifndef __CAT__H
 #define __CAT__H
 
+
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 class Cat
 {
 	public:
-		bool makeCake();
+
+		Cat();
+		~Cat();
+
+		int makeCake();
 		void meow();
-		void sleepy();
+		void query();
+		void sleep();
 
 	private:
 		bool pancakeMix;
