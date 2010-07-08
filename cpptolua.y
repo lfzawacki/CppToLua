@@ -56,7 +56,7 @@ program:
 class:
 			 CLASS IDF hierarchy_opt '{' class_body '}' ';'
 			 {
-				 
+
 			     string className = $2->vs[0].c_str();
 
                  if (global_class_name.empty())
@@ -69,7 +69,7 @@ class:
 			         string type = $5->vi[i].type;
 			         string fooName = $5->vi[i].name;
 
-			         if(type == "Constructor") { 
+			         if(type == "Constructor") {
                      /* um construtor */
 
                      if (fooName[0] != '~')
@@ -87,22 +87,22 @@ class:
 				     }
 
 			         if ( fooName == "") {
-                        /*caso seja um enum*/ 
-                        continue;
-                     } 
-
-                     if (fooName.substr(0, strlen("operator")) == "operator") {
-                        /*caso seja um operator*/                        
-                        continue;
-                     } 
-			         
-                     if (!$5->vi[i].isPublic) {
-                        /* caso nao seja publico */ 
+                        /*caso seja um enum*/
                         continue;
                      }
-			         
+
+                     if (fooName.substr(0, strlen("operator")) == "operator") {
+                        /*caso seja um operator*/
+                        continue;
+                     }
+
+                     if (!$5->vi[i].isPublic) {
+                        /* caso nao seja publico */
+                        continue;
+                     }
+
                      functionNames.push_back(fooName);
-                     
+
                      printf("int %s_%s(lua_State* L) {\n",className.c_str(), fooName.c_str() );
 					 printf("\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 					 for(int j=0; j<$5->vi[i].param.size(); j++)
@@ -114,10 +114,12 @@ class:
 					 }
 
 					 printf("\t");
-					 if(type == "boolean")
+					 if(type == "bool")
 					 	printf("lua_pushboolean(L, ");
 					 else if(type == "char*")
 					 	printf("			;lua_pushstring(L, ");
+					 else if (type == "void")
+					 	printf("");
 					 else //if(type == "double" || typenume == "int" || type == "float")
 					 	printf("lua_pushnumber(L, ");
 					 //problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
@@ -200,7 +202,7 @@ function:
 				   $$->name = $1->vs[$1->vs.size()-1];
 				   //for(int i=0; i<$1->vs.size(); i++)
 				   //  printf("%s ", $1->vs[i].c_str());
-				   vector<Idf> vp;			    
+				   vector<Idf> vp;
 					 //printf("ClassName: %s\n", $1->vs[0].c_str());
 				   for(int i=0; i<$3->vvs.size(); i++)
 			   	   {
@@ -249,9 +251,9 @@ void writeFunctionNames()
     printf("\t%s\n};\n",nullnull);
 
     printf("static const luaL_reg %s_meta[] = {\n",c);
-        vector<string>::iterator i;      
+        vector<string>::iterator i;
         for (i = functionNames.begin(); i != functionNames.end(); i++ ) {
-            printf("\t{ \"%s\" , %s_%s }\n", i->c_str(), c,i->c_str() );        
+            printf("\t{ \"%s\" , %s_%s }\n", i->c_str(), c,i->c_str() );
         }
     printf("\t%s\n};\n\n",nullnull);
 
@@ -268,10 +270,10 @@ void writeFunctionNames()
 
 int main(int argc, char **argv)
 {
-	if(argc < 2) {
-        printf("\tusage: ./cpptolua [.h file] <options>\n");       
-        exit(0);
-    }
+//	{
+//        printf("\tusage: ./cpptolua [.h file] <options>\n");
+//        exit(0);
+//    }
 
 	yyparse();
     writeFunctionNames();
