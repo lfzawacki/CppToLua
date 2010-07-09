@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+extern "C" {
 
-#include "cat.h"
-#include "cat_userdata.cpp"
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+
+}
+
+#include "cat_userdata.h"
 
 lua_State* openLua()
 {
@@ -16,6 +19,8 @@ lua_State* openLua()
 	luaopen_table(L);  // opens the table library
 	luaopen_string(L); // opens the string library
 	luaopen_math(L);   // opens the math library
+
+	luaopen_Cat(L);
 
 	return L;
 
@@ -27,7 +32,8 @@ void loadLuaFile(lua_State* L, const char *filename)
 
 	if(error)
       printf("Error opening file: %s\n",lua_tostring(L, -1));
-    lua_pcall(L, 0, 0, 0);
+    
+	lua_pcall(L, 0, 0, 0);
 }
 
 int main()

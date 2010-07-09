@@ -1,10 +1,8 @@
 #ifndef __CAT__H
 #define __CAT__H
 
-
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 class Cat
 {
@@ -18,8 +16,14 @@ class Cat
 		void query();
 		void sleep();
 
+		void setPancakeMix(int pan);
+		int getPancakeMix();
+
+		void damage(int d);
+		void magic(); 
+
 	private:
-		bool pancakeMix;
+		int pancakeMix;
 		int hp, mp;
 };
 

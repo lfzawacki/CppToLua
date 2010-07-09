@@ -1,8 +1,5 @@
 #include "cat.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 
 Cat::Cat()
 {
@@ -31,7 +28,7 @@ void Cat::query()
 
 void Cat::sleep()
 {
-	printf("zzz zz ");
+	printf("zzz zz    ");
 	printf("Wake him up!\n");
 	getchar();
 }
