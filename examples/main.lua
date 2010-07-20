@@ -1,16 +1,17 @@
 print("Let's make a kitteh")
 
-function Cat:pur()
-	return 2
+local i = 0
+local k = nil
+
+while (true) do
+	k = Cat:new()
+
+	--k:query()
+	--k:sleep()
+
+	--print( "Cat made " .. k:makeCake() .. " with his pancake mix!")
+
+	print(i .. ": " .. tostring(k) )
+
+	i = i + 1
 end
-
-k = Cat:new()
-
-k:query()
-k:sleep()
-
---print( "Cat made " .. k:makeCake() .. " with his pancake mix!")
-
---num = k:pur()
-
-printf("After pur %d\n", num)

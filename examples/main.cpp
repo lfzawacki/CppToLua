@@ -28,12 +28,15 @@ lua_State* openLua()
 
 void loadLuaFile(lua_State* L, const char *filename)
 {
-	int error = luaL_loadfile(L, filename);
+	int fileError = luaL_loadfile(L, filename);
+	int error = lua_pcall(L, 0, 0, 0);
 
-	if(error)
-      printf("Error opening file: %s\n",lua_tostring(L, -1));
-    
-	lua_pcall(L, 0, 0, 0);
+	if(fileError) {
+		printf("Error opening file: %s\n",lua_tostring(L, -1));
+	} else if (error) {
+		printf("Error in lua code: %s\n",lua_tostring(L, -1));
+	}
+
 }
 
 int main()

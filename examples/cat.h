@@ -20,9 +20,10 @@ class Cat
 		int getPancakeMix();
 
 		void damage(int d);
-		void magic(); 
+		void magic();
 
 	private:
+		int array[1024];
 		int pancakeMix;
 		int hp, mp;
 };

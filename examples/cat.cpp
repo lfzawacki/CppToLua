@@ -1,7 +1,7 @@
 #include "cat.h"
 
 
-Cat::Cat()
+Cat::Cat() : pancakeMix(0)
 {
 	printf("Spawned a new kitteh\n");
 }
