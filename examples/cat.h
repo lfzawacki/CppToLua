@@ -23,7 +23,7 @@ class Cat
 		void magic();
 
 	private:
-		int array[1024];
+		int array[9500000];
 		int pancakeMix;
 		int hp, mp;
 };

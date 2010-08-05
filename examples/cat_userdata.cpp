@@ -71,7 +71,7 @@ const struct luaL_reg Catlib [] = {
 	{NULL,NULL}
 };
 
-static const luaL_reg Cat_meta[] = {
+static const luaL_reg Cat_meta[] = {	
 	{ "sleep" , Cat_sleep },
 	{ "query" , Cat_query },
 	{ "meow" , Cat_meow },
