@@ -68,13 +68,14 @@ int Cat_new(lua_State* L) {
 
 const struct luaL_reg Catlib [] = {
 	{"new", Cat_new },
+	{NULL,NULL}
+};
+
+static const luaL_reg Cat_meta[] = {
 	{ "sleep" , Cat_sleep },
 	{ "query" , Cat_query },
 	{ "meow" , Cat_meow },
 	{ "makeCake" , Cat_makeCake },
-	{NULL,NULL}
-};
-static const luaL_reg Cat_meta[] = {
 	{ "__gc", Cat_gc },
 	{ "__tostring", Cat_tostring },
 	{NULL,NULL}
