@@ -331,7 +331,15 @@ void writeFunctionNames()
 		printf("\t%s\n};\n\n",nullnull);
 
 	}    
-	
+
+	printf("%s* to%s(lua_State *L, int index)",c);
+	if(!global_make_header)	 {
+
+		printf("%s *p = (%s*) lua_touserdata(L,index);\n",c,c);
+		printf("if (p == NULL) luaL_typerror(L,index,\"%s\");\n",c);
+		printf("return p;\n");
+	}	
+
     printf("int luaopen_%s(lua_State *L)",c);
 	
 	if (!global_make_header) {
@@ -380,7 +388,7 @@ int main(int argc, char **argv)
 {
 
 	parseOptions(argc,argv);
-       
+  
 	yyparse();
     writeFunctionNames();
 
