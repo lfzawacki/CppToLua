@@ -334,7 +334,6 @@ void writeFunctionNames()
 
 	printf("%s* to%s(lua_State *L, int index)",c,c);
 	if(!global_make_header)	 {
-
 		printf("\n{\n\t%s *p = (%s*) lua_touserdata(L,index);\n",c,c);
 		printf("\tif (p == NULL) luaL_typerror(L,index,\"%s\");\n",c);
 		printf("\treturn p;\n}\n\n");
@@ -343,13 +342,14 @@ void writeFunctionNames()
 	}
 
 	printf("%s* check%s(lua_State *L, int index)",c,c);
-	{
-		Cat *c;
-		luaL_checktype(L, index, LUA_TUSERDATA);
-		c = (Cat*) luaL_checkudata(L, index, "Cat");
-		if (c == NULL) luaL_typerror(L, index, "Cat");
-
-		return c;
+	if (!global_make_header) {
+		printf("\n{\n\t%s *p;\n",c);
+		printf("\tluaL_checktype(L, index, LUA_TUSERDATA);\n");
+		printf("\tp = (%s*) luaL_checkudata(L, index, \"%s\");\n",c,c);
+		printf("\tif (p == NULL) luaL_typerror(L, index, \"%s\");\n",c);
+		printf("\treturn p\n}\n\n");
+	} else {
+		printf(";\n");
 	}
 
   printf("int luaopen_%s(lua_State *L)",c);
