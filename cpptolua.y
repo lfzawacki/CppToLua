@@ -95,7 +95,7 @@ class:
 						
 						if (!global_make_header) {
 		                    printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
-							printf( "\t%s lua_pushlightuserdata(L,p);\n");
+							printf( "\tlua_pushlightuserdata(L,p);\n");
 		                    printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
 		                    printf( "\tlua_setmetatable(L, -2);\n");
 		                    printf( "\treturn 1;\n}\n\n");
@@ -335,7 +335,7 @@ void writeUtilityFunctions()
 			printf("\tluaL_checktype(L, index, LUA_TUSERDATA);\n");
 			printf("\tp = (%s*) luaL_checkudata(L, index, \"%s\");\n",c,c);
 			printf("\tif (p == NULL) luaL_typerror(L, index, \"%s\");\n",c);
-			printf("\treturn p\n}\n\n");
+			printf("\treturn p;\n}\n\n");
 		} else {
 			printf(";\n");
 		}
@@ -344,7 +344,7 @@ void writeUtilityFunctions()
 		//Function to open the library
 		printf("int luaopen_%s(lua_State *L)",c);
 		if (!global_make_header) {
-			printf("\n{\n\tluaL_newmetatable(L, \"%s\")\n",c);
+			printf("\n{\n\tluaL_newmetatable(L, \"%s\");\n",c);
 			printf("\tlua_pushstring(L, \"__index\");\n");
 			printf("\tlua_pushvalue(L, -2);\n");
 			printf("\tlua_settable(L, -3);\n");

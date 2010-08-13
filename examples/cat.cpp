@@ -32,3 +32,23 @@ void Cat::sleep()
 	printf("Wake him up!\n");
 	getchar();
 }
+
+void Cat::setPancakeMix(int pan)
+{
+	pancakeMix = pan;
+}
+
+int Cat::getPancakeMix()
+{
+	return pancakeMix;
+}
+
+void Cat::damage(int d)
+{
+	 hp = MAX(0,hp - d);
+}
+
+void Cat::magic()
+{
+	printf("poof\n");
+}

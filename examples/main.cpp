@@ -21,10 +21,8 @@ extern "C" {
 
 }
 
-/*
- * ** Here you include all the Robopet libraries 
- * */
 
+#include "lynx_userdata.h"
 #include "cat_userdata.h"
 
 static lua_State *globalL = NULL;
@@ -356,8 +354,10 @@ static int pmain (lua_State *L) {
 
   luaL_openlibs(L);  /* open libraries */
   luaopen_Cat(L);
-
+  luaopen_Lynx(L);
+  
   lua_gc(L, LUA_GCRESTART, 0);
+  
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
   script = collectargs(argv, &has_i, &has_v, &has_e);
