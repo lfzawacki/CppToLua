@@ -332,15 +332,27 @@ void writeFunctionNames()
 
 	}    
 
-	printf("%s* to%s(lua_State *L, int index)",c);
+	printf("%s* to%s(lua_State *L, int index)",c,c);
 	if(!global_make_header)	 {
 
-		printf("%s *p = (%s*) lua_touserdata(L,index);\n",c,c);
-		printf("if (p == NULL) luaL_typerror(L,index,\"%s\");\n",c);
-		printf("return p;\n");
-	}	
+		printf("\n{\n\t%s *p = (%s*) lua_touserdata(L,index);\n",c,c);
+		printf("\tif (p == NULL) luaL_typerror(L,index,\"%s\");\n",c);
+		printf("\treturn p;\n}\n\n");
+	}	else {
+		printf(";\n");
+	}
 
-    printf("int luaopen_%s(lua_State *L)",c);
+	printf("%s* check%s(lua_State *L, int index)",c,c);
+	{
+		Cat *c;
+		luaL_checktype(L, index, LUA_TUSERDATA);
+		c = (Cat*) luaL_checkudata(L, index, "Cat");
+		if (c == NULL) luaL_typerror(L, index, "Cat");
+
+		return c;
+	}
+
+  printf("int luaopen_%s(lua_State *L)",c);
 	
 	if (!global_make_header) {
 		printf("\n{\n\tluaL_newmetatable(L, \"%s\")\n",c);
