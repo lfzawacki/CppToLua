@@ -15,6 +15,8 @@ int yylex(void);
 void yyerror(char *);
 void displayUsage();
 void parseOptions(int argc, char **argv);
+
+void writeUtilityFunctions();
 void writeFunctionNames();
 void printHeaders(string className) ;
 
@@ -309,63 +311,75 @@ void parseOptions(int argc, char **argv)
 
 }
 
+void writeUtilityFunctions()
+{
+
+		const char* c = global_class_name.c_str();
+
+		//Class* toClass(lua_State *L, int index)
+		//Utility to convert a userdata pointer to a Class pointer
+		printf("%s* to%s(lua_State *L, int index)",c,c);
+		if(!global_make_header)	 {
+			printf("\n{\n\t%s *p = (%s*) lua_touserdata(L,index);\n",c,c);
+			printf("\tif (p == NULL) luaL_typerror(L,index,\"%s\");\n",c);
+			printf("\treturn p;\n}\n\n");
+		}	else {
+			printf(";\n");
+		}
+
+		//Class* checkClass(lua_State *L, int index)
+		//Utility to check if a pointer in the stack is of type (*Class)
+		printf("%s* check%s(lua_State *L, int index)",c,c);
+		if (!global_make_header) {
+			printf("\n{\n\t%s *p;\n",c);
+			printf("\tluaL_checktype(L, index, LUA_TUSERDATA);\n");
+			printf("\tp = (%s*) luaL_checkudata(L, index, \"%s\");\n",c,c);
+			printf("\tif (p == NULL) luaL_typerror(L, index, \"%s\");\n",c);
+			printf("\treturn p\n}\n\n");
+		} else {
+			printf(";\n");
+		}
+
+		//int luaopen_Cat(lua_State *L)
+		//Function to open the library
+		printf("int luaopen_%s(lua_State *L)",c);
+		if (!global_make_header) {
+			printf("\n{\n\tluaL_newmetatable(L, \"%s\")\n",c);
+			printf("\tlua_pushstring(L, \"__index\");\n");
+			printf("\tlua_pushvalue(L, -2);\n");
+			printf("\tlua_settable(L, -3);\n");
+			printf("\tluaL_openlib(L, NULL, %s_meta, 0);\n",c);
+			printf("\tluaL_openlib(L, \"%s\", %slib, 0);\n",c,c);
+			printf("\treturn 1;\n}\n");
+
+		} else {
+			printf(";\n");			
+		}
+
+}
+
 void writeFunctionNames()
 {
 
     const char* nullnull = "{NULL,NULL}";
     const char* c = global_class_name.c_str();
 
-	if (!global_make_header) {
-		printf("const struct luaL_reg %slib [] = {\n",c);
+		if (!global_make_header) {
+			printf("const struct luaL_reg %slib [] = {\n",c);
     	printf("\t{\"new\", %s_new },\n",c);
     	printf("\t%s\n};\n\n",nullnull);
 
-		printf("static const luaL_reg %s_meta[] = {\n",c);
+			printf("static const luaL_reg %s_meta[] = {\n",c);
 
-		vector<string>& fn = global_function_names;    
-		vector<string>::iterator i;
-		for (i = fn.begin(); i != fn.end(); i++ ) {
+			vector<string>& fn = global_function_names;    
+			vector<string>::iterator i;
+			for (i = fn.begin(); i != fn.end(); i++ ) {
 		    printf("\t{ \"%s\" , %s_%s },\n", i->c_str(), c,i->c_str() );
-		}
+			}
 
-		printf("\t%s\n};\n\n",nullnull);
+			printf("\t%s\n};\n\n",nullnull);
 
-	}    
-
-	printf("%s* to%s(lua_State *L, int index)",c,c);
-	if(!global_make_header)	 {
-		printf("\n{\n\t%s *p = (%s*) lua_touserdata(L,index);\n",c,c);
-		printf("\tif (p == NULL) luaL_typerror(L,index,\"%s\");\n",c);
-		printf("\treturn p;\n}\n\n");
-	}	else {
-		printf(";\n");
-	}
-
-	printf("%s* check%s(lua_State *L, int index)",c,c);
-	if (!global_make_header) {
-		printf("\n{\n\t%s *p;\n",c);
-		printf("\tluaL_checktype(L, index, LUA_TUSERDATA);\n");
-		printf("\tp = (%s*) luaL_checkudata(L, index, \"%s\");\n",c,c);
-		printf("\tif (p == NULL) luaL_typerror(L, index, \"%s\");\n",c);
-		printf("\treturn p\n}\n\n");
-	} else {
-		printf(";\n");
-	}
-
-  printf("int luaopen_%s(lua_State *L)",c);
-	
-	if (!global_make_header) {
-		printf("\n{\n\tluaL_newmetatable(L, \"%s\")\n",c);
-		printf("\tlua_pushstring(L, \"__index\");\n");
-		printf("\tlua_pushvalue(L, -2);\n");
-		printf("\tlua_settable(L, -3);\n");
-		printf("\tluaL_openlib(L, NULL, %s_meta, 0);\n",c);
-		printf("\tluaL_openlib(L, \"%s\", %slib, 0);\n",c,c);
-		printf("\treturn 1;\n}\n");
-
-	} else {
-		printf(";\n");			
-	}
+		}    
 
 }
 
@@ -402,8 +416,9 @@ int main(int argc, char **argv)
 	parseOptions(argc,argv);
   
 	yyparse();
-    writeFunctionNames();
-
+  writeFunctionNames();
+	writeUtilityFunctions();
+	
 	return 0;
 
 }
