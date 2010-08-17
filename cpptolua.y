@@ -348,8 +348,8 @@ void writeUtilityFunctions()
 			printf("\tlua_pushstring(L, \"__index\");\n");
 			printf("\tlua_pushvalue(L, -2);\n");
 			printf("\tlua_settable(L, -3);\n");
-			printf("\tluaL_openlib(L, NULL, %s_meta, 0);\n",c);
-			printf("\tluaL_openlib(L, \"%s\", %slib, 0);\n",c,c);
+			printf("\tluaL_register(L, NULL, %s_meta);\n",c);
+			printf("\tluaL_register(L, \"%s\", %slib);\n",c,c);
 			printf("\treturn 1;\n}\n");
 
 		} else {
