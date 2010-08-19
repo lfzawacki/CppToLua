@@ -340,12 +340,15 @@ void writeUtilityFunctions()
 			printf(";\n");
 		}
 
-		//int luaopen_Cat(lua_State *L)
+		//int luaopen_Class(lua_State *L)
 		//Function to open the library
 		printf("int luaopen_%s(lua_State *L)",c);
 		if (!global_make_header) {
 			printf("\n{\n\tluaL_newmetatable(L, \"%s\");\n",c);
-			printf("\tlua_pushstring(L, \"__index\");\n");
+			//if (has_inheritance) {
+				//printf("\tluaL_getmetatable(\"%s\");\n",sc);			
+			//}
+			printf("\tlua_pushstring(L, \"__index\");\n");			
 			printf("\tlua_pushvalue(L, -2);\n");
 			printf("\tlua_settable(L, -3);\n");
 			printf("\tluaL_register(L, NULL, %s_meta);\n",c);
