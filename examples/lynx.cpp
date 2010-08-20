@@ -20,7 +20,7 @@ void Lynx::kamehameha()
 void Lynx::checkFightPower()
 {
 		printf("What does the scouter say about his power level?\n");
-		printf("It's over %d!!",getFightPower()-1);
+		printf("It's over %d!!\n",getFightPower()-1);
 }
 
 int Lynx::getFightPower()
