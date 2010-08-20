@@ -3,8 +3,10 @@ manipulated inside Lua scripts
 
 Under development, it barely works
 
-problemas: herdar metodos de outras classes....			   ALMOST DONE
-           nao deve pegar metodos private ou protected.... DONE
+-----------
+
+problemas: herdar metodos de outras classes							 DONE
+           nao deve pegar metodos private ou protected						 DONE
            tratar tipos com mais de uma palavra (char *)
-		   tratar retorno de tipo composto (classe, diferenciar de enum)
-		   quando o método tiver a palavra operator e nao for um operatorX() ele vai ignorar.... DONE
+	   tratar retorno de tipo composto (classe, diferenciar de enum)
+	   quando o método tiver a palavra operator e nao for um operatorX() ele vai ignorar	 DONE
