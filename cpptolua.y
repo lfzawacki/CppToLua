@@ -20,6 +20,22 @@ void writeUtilityFunctions();
 void writeFunctionNames();
 void printHeaders(string className) ;
 
+void typePush(string type)
+{
+	if(type == "bool")
+		printf("lua_pushboolean(L, ");
+	else if(type == "char*")
+		printf("lua_pushstring(L, ");
+	else if (type == "void")
+		printf("");
+	else //if(type == "double" || typenume == "int" || type == "float")
+		printf("lua_pushnumber(L, ");
+
+	//problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
+	//devem ser tratadas com pushlightuserdata. Como fazer????
+
+}
+
 /* if the member has public scope */
 bool member_scope_public = false;
 
@@ -53,12 +69,6 @@ vector<string> global_function_names;
 %type <n> class_body
 
 %%
-
-//problemas: herdar metodos de outras classes....
-//           nao deve pegar metodos private ou protected.... DONE
-//					 tratar tipos com mais de uma palavra (char *)
-//					 tratar retorno de tipo composto (classe, diferenciar de enum)
-//					quando o método tiver a palavra operator e nao for um operatorX() ele vai ignorar.... DONE
 
 program:
 			
@@ -138,29 +148,27 @@ class:
 						}
 
 						printf("\t");
-						if(type == "bool")
-						printf("lua_pushboolean(L, ");
-						else if(type == "char*")
-						printf("			;lua_pushstring(L, ");
-						else if (type == "void")
-						printf("");
-						else //if(type == "double" || typenume == "int" || type == "float")
-						printf("lua_pushnumber(L, ");
-						//problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
-						//devem ser tratadas com pushlightuserdata. Como fazer????
+						//uses the right lua_push* function based the type
+						typePush(type);
 
+						//pushing the function and all the parameters
 						printf("c->%s(", fooName.c_str());
 						for(int j=0; j<$5->vi[i].param.size(); j++)
 						{
-						if(j>0) printf(", ");
-						printf("%s", $5->vi[i].param[j].name.c_str());
+							if(j>0) printf(", ");
+							printf("%s", $5->vi[i].param[j].name.c_str());
 						}
 						printf(")");
 
+						//if it's not void we've got to close a parentheses
 						if(type != "void") printf(");\n");
 						else printf(";\n");
 
+						//returns 1 if there's something at the stack
+						printf("\treturn %d;\n",type == "void" ? 0 : 1);
+
 						printf("}\n\n");
+
 					 } else {
 						printf(";\n");
 					 }
@@ -278,7 +286,7 @@ void parseOptions(int argc, char **argv)
 {	
 	char ch;
 
-	while((ch = getopt(argc, argv, "hHi:o:n:")) != EOF) {
+	while((ch = getopt(argc, argv, "hHi:o:n:N:")) != EOF) {
 		switch(ch) {
 			//display help
 			case 'h':  
@@ -305,6 +313,9 @@ void parseOptions(int argc, char **argv)
 			//name of the include in the .cpp
 			case 'n':
 				global_header_name = optarg;
+				break;
+			case 'N':
+				global_file_name = optarg;
 				break;
 		}
 	}

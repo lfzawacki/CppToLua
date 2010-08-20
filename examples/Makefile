@@ -1,5 +1,5 @@
 # compiler
-CC = g++
+CC = g++ -Wall
 CC2L = ../cpptolua
 
 LUA = -llua -Ilua-5.1.4/include -Llua-5.1.4/lib -ldl
