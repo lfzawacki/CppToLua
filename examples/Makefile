@@ -17,7 +17,7 @@ cpp: $(OBJECTS)
 	$(CC) -o cppmain $(OBJECTS) maincpp.cpp
 
 lynx.o: lynx.cpp
-	$(CC) -c -o $@ $^ 
+	$(CC) -c -o $@ $^
 
 cat.o: cat.cpp
 	$(CC) -c -o $@ $^
@@ -26,12 +26,11 @@ cat.o: cat.cpp
 	$(CC) -c -o $@ $^ $(LUA)
 
 %_userdata.cpp: %.h
-	$(CC2L) -i $< -o $@
-	
+	$(CC2L) -i $< -o $@ -n $*_userdata.h
+
 %_userdata.h: %.h
 	$(CC2L) -i $< -o $@ -H
-	
-clean: 
+
+clean:
 	rm *.o
 	rm *_userdata.*
-

@@ -18,32 +18,18 @@ void parseOptions(int argc, char **argv);
 
 void writeUtilityFunctions();
 void writeFunctionNames();
-void printHeaders(string className) ;
-
-void typePush(string type)
-{
-	if(type == "bool")
-		printf("lua_pushboolean(L, ");
-	else if(type == "char*")
-		printf("lua_pushstring(L, ");
-	else if (type == "void")
-		printf("");
-	else //if(type == "double" || typenume == "int" || type == "float")
-		printf("lua_pushnumber(L, ");
-
-	//problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
-	//devem ser tratadas com pushlightuserdata. Como fazer????
-
-}
+void writeHeaders(string className) ;
+void writeTypePush(string type);
+void writeConstructor(string className);
 
 /* if the member has public scope */
 bool member_scope_public = false;
-
 bool global_make_header = false;
+bool global_has_super_class = false;
 
 /* there should be only one class per file */
 string global_class_name = "";
-
+string global_super_class_name = "";
 string global_file_name = "your_header_name_here.h";
 string global_header_name = "your_header_name_here.h";
 
@@ -71,197 +57,192 @@ vector<string> global_function_names;
 %%
 
 program:
-			
+
 			directive_list_opt class
 			;
 
 class:
-			 CLASS IDF hierarchy_opt '{' class_body '}' ';'
-			 {
+			CLASS IDF hierarchy_opt '{' class_body '}' ';'
+			{
 
-			     string className = $2->vs[0].c_str();
+				string className = $2->vs[0].c_str();
 
-				 printHeaders(className);
+				writeHeaders(className);
 
-                 if (global_class_name.empty())
-                    global_class_name = className;
+				if (global_class_name.empty())
+					global_class_name = className;
 
-				 //$$ = className;
-			     //printf("ClassName: %s\n", className);
-			     for(int i=0; i<$5->vi.size(); i++)
-			     {
-			         string type = $5->vi[i].type;
-			         string fooName = $5->vi[i].name;
+				//$$ = className;
+				//printf("ClassName: %s\n", className);
+				for(int i=0; i<$5->vi.size(); i++)
+				{
+					string type = $5->vi[i].type;
+					string fooName = $5->vi[i].name;
 
-			         if(type == "Constructor") {
-                     	/* um construtor */
+					if(type == "Constructor") {
+					/* a constructor */
 
-                     if (fooName[0] != '~')
-                        continue;
+						// a destructor
+						if(fooName[0] != '~')
+							continue;
 
-                        const char* cnc = className.c_str();
-                        
-						printf( "int %s_new(lua_State* L)",cnc);
-						
-						if (!global_make_header) {
-		                    printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
-							printf( "\tlua_pushlightuserdata(L,p);\n");
-		                    printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
-		                    printf( "\tlua_setmetatable(L, -2);\n");
-		                    printf( "\treturn 1;\n}\n\n");
-						} else {
-							printf(";\n");
-						}
+					writeConstructor(className);
 
-                        continue;
-				     }
+					continue;
+				}
 
-			         if ( fooName == "") {
-                        /*caso seja um enum*/
-                        continue;
-                     }
+				if ( fooName == "") {
+					/*caso seja um enum*/
+					continue;
+				}
 
-                     if (fooName.substr(0, strlen("operator")) == "operator") {
-                        /*caso seja um operator*/
-                        continue;
-                     }
+				if (fooName.substr(0, strlen("operator")) == "operator") {
+					/*caso seja um operator*/
+					continue;
+				}
 
-                     if (!$5->vi[i].isPublic) {
-                        /* caso nao seja publico */
-                        continue;
-                     }
+				if (!$5->vi[i].isPublic) {
+					/* caso nao seja publico */
+					continue;
+				}
 
-                     global_function_names.push_back(fooName);
+				global_function_names.push_back(fooName);
 
-                     printf("int %s_%s(lua_State* L)",className.c_str(), fooName.c_str() );
-					 
-					 if (!global_make_header) {
-							
-						printf("\n{\n\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
+				printf("int %s_%s(lua_State* L)",className.c_str(), fooName.c_str() );
 
-						for(int j=0; j<$5->vi[i].param.size(); j++)
-						{			;
-							string paramType = $5->vi[i].param[j].type;
-							string paramName = $5->vi[i].param[j].name;
-							if(paramType=="int" || paramType=="float" || paramType=="double")
-								printf("\t%s %s = luaL_checknumber(L, %d);\n", paramType.c_str(), paramName.c_str(), j+2);
-						}
+				if (!global_make_header) {
 
-						printf("\t");
-						//uses the right lua_push* function based the type
-						typePush(type);
+					printf("\n{\n\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 
-						//pushing the function and all the parameters
-						printf("c->%s(", fooName.c_str());
-						for(int j=0; j<$5->vi[i].param.size(); j++)
-						{
-							if(j>0) printf(", ");
-							printf("%s", $5->vi[i].param[j].name.c_str());
-						}
-						printf(")");
+					for(int j=0; j<$5->vi[i].param.size(); j++)
+					{			;
+						string paramType = $5->vi[i].param[j].type;
+						string paramName = $5->vi[i].param[j].name;
+						if(paramType=="int" || paramType=="float" || paramType=="double")
+							printf("\t%s %s = luaL_checknumber(L, %d);\n", paramType.c_str(), paramName.c_str(), j+2);
+					}
 
-						//if it's not void we've got to close a parentheses
-						if(type != "void") printf(");\n");
-						else printf(";\n");
+					printf("\t");
+					//uses the right lua_push* function based the type
+					writeTypePush(type);
 
-						//returns 1 if there's something at the stack
-						printf("\treturn %d;\n",type == "void" ? 0 : 1);
+					//pushing the function and all the parameters
+					printf("c->%s(", fooName.c_str());
+					for(int j=0; j<$5->vi[i].param.size(); j++)
+					{
+						if(j>0) printf(", ");
+						printf("%s", $5->vi[i].param[j].name.c_str());
+					}
+					printf(")");
 
-						printf("}\n\n");
-
-					 } else {
+					//if it's not void we've got to close a parentheses
+					if(type != "void")
+						printf(");\n");
+					else
 						printf(";\n");
-					 }
-					 
-			         /*
-			         printf("%s: %s %s( ", $2->vs[0].c_str(), $5->vi[i].type.c_str(), $5->vi[i].name.c_str());
-			   	     for(int j=0; j<$5->vi[i].param.size(); j++)
-			   	         printf("%s %s ", $5->vi[i].param[j].type.c_str(), $5->vi[i].param[j].name.c_str());
-			   	     printf(")\n");
-			   	     */
-			   	 }
-			 }
-	;
+
+					//returns 1 if there's something at the stack
+					printf("\treturn %d;\n",type == "void" ? 0 : 1);
+
+					printf("}\n\n");
+
+					} else {
+						printf(";\n");
+					}
+
+/*
+printf("%s: %s %s( ", $2->vs[0].c_str(), $5->vi[i].type.c_str(), $5->vi[i].name.c_str());
+for(int j=0; j<$5->vi[i].param.size(); j++)
+ printf("%s %s ", $5->vi[i].param[j].type.c_str(), $5->vi[i].param[j].name.c_str());
+printf(")\n");
+*/
+}
+	}
+;
 
 directive_list_opt:
-					'#' IDF directive_param_opt { /*$$ = $2;*/ }
-					| { /*$$ = "";*/ }
-					;
+			'#' IDF directive_param_opt { /*$$ = $2;*/ }
+			| { /*$$ = "";*/ }
+			;
 
 directive_param_opt:
-					'<' IDF '>' { /*$$ = $2;*/ }
-					| IDF { /*$$ = "";*/ }
-					| { /*$$ = "";*/ }
-					;
+			'<' IDF '>' { /*$$ = $2;*/ }
+			| IDF { /*$$ = "";*/ }
+			| { /*$$ = "";*/ }
+			;
 
 class_body:
-					VISIBILITY ':' class_body { $$ = $3; }
-					| function class_body { $$ = $2; $$->vi.push_back(*$1); }
-					| idf_comma_list ';' class_body { $$ = $3; }
-					| /* empty */ { $$ = new Node; }
-					;
+			VISIBILITY ':' class_body { $$ = $3; }
+			| function class_body { $$ = $2; $$->vi.push_back(*$1); }
+			| idf_comma_list ';' class_body { $$ = $3; }
+			| /* empty */ { $$ = new Node; }
+			;
 
 hierarchy_opt:
-						 ':' VISIBILITY idf_comma_list
-						 | /* empty */
-						 ;
+			':' VISIBILITY idf_comma_list { global_super_class_name = $3->vvs[0][0];
+											global_has_super_class = true; }
+			| /* empty */ { global_has_super_class = false; }
+			;
 
 idf_comma_list_opt:
-									idf_comma_list { $$ = $1;  }
-									| /* empty */   { $$ = new StringVecVec; }
-									;
+			idf_comma_list { $$ = $1;  }
+			| /* empty */   { $$ = new StringVecVec; }
+			;
 
 idf_comma_list:
-							idf_list { $$ = new StringVecVec; $$->vvs.push_back($1->vs); }
-							| idf_comma_list ',' idf_list { $$ = $1; $$->vvs.push_back($3->vs); }
-							;
+			idf_list { $$ = new StringVecVec; $$->vvs.push_back($1->vs); }
+			| idf_comma_list ',' idf_list { $$ = $1; $$->vvs.push_back($3->vs); }
+			;
 
 idf_list_opt:
-						idf_list { $$ = $1; }
-						| /* empty */					{ $$ = new StringVec; }
-						;
+			idf_list { $$ = $1; }
+			| /* empty */{ $$ = new StringVec; }
+			;
 
 idf_list:
-				idf_list IDF    { $$ = $1; $$->vs.push_back($2->vs[0]); }
-				| IDF           { $$ = $1; }
-				;
+			idf_list IDF    { $$ = $1; $$->vs.push_back($2->vs[0]); }
+			| IDF           { $$ = $1; }
+			;
 
 function:
-				 idf_list '(' idf_comma_list_opt ')' idf_list_opt function_body
-				 {
+			idf_list '(' idf_comma_list_opt ')' idf_list_opt function_body
+			{
 
-				   $$ = new Idf;
-				   if($1->vs.size() >= 2) //se nao for construtor/destrutor, vai ter um tipo
-				     $$->type = $1->vs[$1->vs.size()-2];
-				   else
-				     $$->type = "Constructor";
-				   $$->name = $1->vs[$1->vs.size()-1];
-				   //for(int i=0; i<$1->vs.size(); i++)
-				   //  printf("%s ", $1->vs[i].c_str());
-				   vector<Idf> vp;
-					 //printf("ClassName: %s\n", $1->vs[0].c_str());
-				   for(int i=0; i<$3->vvs.size(); i++)
-			   	   {
-			   	 	  Idf p;
-			   	 	  p.type = $3->vvs[i][$3->vvs[i].size()-2];
-			   	 	  p.name = $3->vvs[i][$3->vvs[i].size()-1];
-			   	 	  vp.push_back(p);
-			   	   }
-			   	   $$->param = vp;
-			   	   $$->isPublic = member_scope_public;
-			   	   /* This shows what functions are in the data structure
-			   	   printf("%s %s( ", $$->type.c_str(), $$->name.c_str());
-			   	   for(int i=0; i<$$->param.size(); i++)
-			   	       printf("%s %s ", $$->param[i].type.c_str(), $$->param[i].name.c_str());
-			   	   printf(")\n");
-			   	   */
-				   //for(int i=0; i<$3->vvs.size(); i++)
-				   //	 for(int j=0; j<$3->vvs[i].size(); j++)
-				   	   //printf("%s ", $3->vvs[i][j].c_str());
-				   //printf("\n");
-				 }
-				 | idf_list '{' '}' ';' { $$ = new Idf; } // for enum
-				 ;
+				$$ = new Idf;
+				if($1->vs.size() >= 2) //se nao for construtor/destrutor, vai ter um tipo
+					$$->type = $1->vs[$1->vs.size()-2];
+				else
+					$$->type = "Constructor";
+
+				$$->name = $1->vs[$1->vs.size()-1];
+				//for(int i=0; i<$1->vs.size(); i++)
+				//printf("%s ", $1->vs[i].c_str());
+				vector<Idf> vp;
+				//printf("ClassName: %s\n", $1->vs[0].c_str());
+			for(int i=0; i<$3->vvs.size(); i++)
+			{
+				Idf p;
+				p.type = $3->vvs[i][$3->vvs[i].size()-2];
+				p.name = $3->vvs[i][$3->vvs[i].size()-1];
+				vp.push_back(p);
+			}
+
+			$$->param = vp;
+			$$->isPublic = member_scope_public;
+			/* This shows what functions are in the data structure
+			printf("%s %s( ", $$->type.c_str(), $$->name.c_str());
+			for(int i=0; i<$$->param.size(); i++)
+			   printf("%s %s ", $$->param[i].type.c_str(), $$->param[i].name.c_str());
+			printf(")\n");
+			*/
+			//for(int i=0; i<$3->vvs.size(); i++)
+			//	 for(int j=0; j<$3->vvs[i].size(); j++)
+				//printf("%s ", $3->vvs[i][j].c_str());
+			//printf("\n");
+			}
+
+			| idf_list '{' '}' ';' { $$ = new Idf; } // for enum
+			;
 
 function_body:
 						 ';'
@@ -288,33 +269,33 @@ void displayUsage()
 }
 
 void parseOptions(int argc, char **argv)
-{	
+{
 	char ch;
 
 	while((ch = getopt(argc, argv, "hHi:o:n:N:")) != EOF) {
 		switch(ch) {
 			//display help
-			case 'h':  
-				displayUsage(); 
+			case 'h':
+				displayUsage();
 				exit(0);
 				break;
 
 			//make a header instead of a cpp file
-			case 'H':  
-				global_make_header = true; 
+			case 'H':
+				global_make_header = true;
 				break;
 
-			//input file	
+			//input file
 			case 'i':
 				global_file_name = optarg;
-				freopen(optarg,"r",stdin); 
+				freopen(optarg,"r",stdin);
 				break;
 
-			//output file 
+			//output file
 			case 'o':
-				freopen(optarg,"w",stdout); 
+				freopen(optarg,"w",stdout);
 				break;
-			
+
 			//name of the include in the .cpp
 			case 'n':
 				global_header_name = optarg;
@@ -361,18 +342,20 @@ void writeUtilityFunctions()
 		printf("int luaopen_%s(lua_State *L)",c);
 		if (!global_make_header) {
 			printf("\n{\n\tluaL_newmetatable(L, \"%s\");\n",c);
-			//if (has_inheritance) {
-				//printf("\tluaL_getmetatable(\"%s\");\n",sc);			
-			//}
-			printf("\tlua_pushstring(L, \"__index\");\n");			
+			if (global_has_super_class) {
+				printf("\tluaL_getmetatable(L,\"%s\");\n",global_super_class_name.c_str());
+			}
+			printf("\tlua_pushstring(L, \"__index\");\n");
 			printf("\tlua_pushvalue(L, -2);\n");
-			printf("\tlua_settable(L, -3);\n");
+			//if we pushed the superclass metatable the real table is one position further in
+			//the stack thus it may be -(3+1)
+			printf("\tlua_settable(L, -%d);\n", 3 + (global_has_super_class ? 1 : 0) );
 			printf("\tluaL_register(L, NULL, %s_meta);\n",c);
 			printf("\tluaL_register(L, \"%s\", %slib);\n",c,c);
 			printf("\treturn 1;\n}\n");
 
 		} else {
-			printf(";\n");			
+			printf(";\n");
 		}
 
 }
@@ -390,7 +373,7 @@ void writeFunctionNames()
 
 			printf("static const luaL_reg %s_meta[] = {\n",c);
 
-			vector<string>& fn = global_function_names;    
+			vector<string>& fn = global_function_names;
 			vector<string>::iterator i;
 			for (i = fn.begin(); i != fn.end(); i++ ) {
 		    printf("\t{ \"%s\" , %s_%s },\n", i->c_str(), c,i->c_str() );
@@ -398,18 +381,18 @@ void writeFunctionNames()
 
 			printf("\t%s\n};\n\n",nullnull);
 
-		}    
+		}
 
 }
 
-void printHeaders(string className) 
+void writeHeaders(string className)
 {
 
 	const char *disclaimer = "This file was automatically generated by cpptolua\n";
 
 	printf("/*\n\tLua bindings for class %s\n\t%s\n*/\n\n",className.c_str(), disclaimer);
 
-	
+
 	if (global_make_header) {
 		printf("#include \"%s\"\n\n",global_file_name.c_str());
 		printf("extern \"C\" {\n");
@@ -417,13 +400,47 @@ void printHeaders(string className)
 		const char *headers[3] = { "lua.h" , "lauxlib.h" , "lualib.h" };
 
 		for (int i=0; i < 3; ++i) {
-			printf("\t#include \"%s\"\n",headers[i]);		
+			printf("\t#include \"%s\"\n",headers[i]);
 		}
-		
+
 		printf("\n}\n\n");
 
 	} else {
 			printf("#include \"%s\"\n\n",global_header_name.c_str());
+	}
+
+}
+
+void writeTypePush(string type)
+{
+	if(type == "bool")
+		printf("lua_pushboolean(L, ");
+	else if(type == "char*")
+		printf("lua_pushstring(L, ");
+	else if (type == "void")
+		printf("");
+	else //if(type == "double" || typenume == "int" || type == "float")
+		printf("lua_pushnumber(L, ");
+
+	//problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
+	//devem ser tratadas com pushlightuserdata. Como fazer????
+
+}
+
+void writeConstructor(string className)
+{
+	const char* cnc = className.c_str();
+
+	printf( "int %s_new(lua_State* L)",cnc);
+
+	if (!global_make_header) {
+		printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
+		printf( "\tlua_pushlightuserdata(L,p);\n");
+		printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
+		printf( "\tlua_setmetatable(L, -2);\n");
+		printf( "\treturn 1;\n}\n\n");
+	} else {
+		printf(";\n");
 	}
 
 }
@@ -433,11 +450,10 @@ int main(int argc, char **argv)
 {
 
 	parseOptions(argc,argv);
-  
 	yyparse();
-  writeFunctionNames();
+	writeFunctionNames();
 	writeUtilityFunctions();
-	
+
 	return 0;
 
 }
