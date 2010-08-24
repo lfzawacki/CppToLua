@@ -27,3 +27,8 @@ int Lynx::getFightPower()
 {
 	return fightPower;
 }
+
+void Lynx::setFightPower(int power)
+{
+	fightPower = power;
+}
