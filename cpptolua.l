@@ -5,7 +5,7 @@
 #include <assert.h>
 	void yyerror(char *);
 	int idf(char *s);
-#define DEBUG
+//#define DEBUG
 %}
 
 %%

@@ -22,6 +22,15 @@ void writeHeaders(string className) ;
 void writeTypePush(string type);
 void writeConstructor(string className);
 
+string makeVariableName(string type, int index)
+{
+	char *buffer = (char*) malloc( sizeof type.c_str() + sizeof "just_a_" + sizeof "_00" );
+	sprintf(buffer,"just_a_%s_%01d" , type.c_str(), index );
+	string ret = buffer;
+	free(buffer);
+	return ret;
+}
+
 /* if the member has public scope */
 bool member_scope_public = false;
 bool global_make_header = false;
@@ -219,35 +228,40 @@ function:
 				//printf("%s ", $1->vs[i].c_str());
 				vector<Idf> vp;
 				//printf("ClassName: %s\n", $1->vs[0].c_str());
-			for(int i=0; i<$3->vvs.size(); i++)
-			{
-				Idf p;
-				p.type = $3->vvs[i][$3->vvs[i].size()-2];
-				p.name = $3->vvs[i][$3->vvs[i].size()-1];
-				vp.push_back(p);
-			}
 
-			$$->param = vp;
-			$$->isPublic = member_scope_public;
-			/* This shows what functions are in the data structure
-			printf("%s %s( ", $$->type.c_str(), $$->name.c_str());
-			for(int i=0; i<$$->param.size(); i++)
-			   printf("%s %s ", $$->param[i].type.c_str(), $$->param[i].name.c_str());
-			printf(")\n");
-			*/
-			//for(int i=0; i<$3->vvs.size(); i++)
-			//	 for(int j=0; j<$3->vvs[i].size(); j++)
-				//printf("%s ", $3->vvs[i][j].c_str());
-			//printf("\n");
-			}
+				for(int i=0; i<$3->vvs.size(); i++)
+				{
+					Idf p;
 
-			| idf_list '{' '}' ';' { $$ = new Idf; } // for enum
-			;
+
+					p.type = $3->vvs[i][0];
+					p.name = makeVariableName(p.type,i);
+					//p.name = $3->vvs[i][$3->vvs[i].size()-1];
+
+					vp.push_back(p);
+				}
+
+				$$->param = vp;
+				$$->isPublic = member_scope_public;
+				/* This shows what functions are in the data structure
+				printf("%s %s( ", $$->type.c_str(), $$->name.c_str());
+				for(int i=0; i<$$->param.size(); i++)
+				   printf("%s %s ", $$->param[i].type.c_str(), $$->param[i].name.c_str());
+				printf(")\n");
+				*/
+				//for(int i=0; i<$3->vvs.size(); i++)
+				//	 for(int j=0; j<$3->vvs[i].size(); j++)
+					//printf("%s ", $3->vvs[i][j].c_str());
+				//printf("\n");
+				}
+
+				| idf_list '{' '}' ';' { $$ = new Idf; } // for enum
+				;
 
 function_body:
-						 ';'
-						 | '{' block '}'
-						 ;
+			 ';'
+			 | '{' block '}'
+			 ;
 
 block:
 		 idf_list ';'
