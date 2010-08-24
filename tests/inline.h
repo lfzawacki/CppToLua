@@ -1,71 +1,20 @@
 /*
 
-	Tests for inlined code in a .h and returning references
-	Taken from http://rosettacode.org/wiki/Define_a_primitive_data_type#C.2B.2B
-	made some modifications to remove exceptions
+	Tests for inlined code in a .h
 
 */
-#ifndef __TINY__INT__H
-#define __TINY__INT__H
 
-class tiny_int
+#include <stdio.h>
+
+class Wizard
 {
 	public:
+		Wizard (int h,int m) { hp = h; mp = m; }
+		~Wizard () { }
 
-	tiny_int(int i): value(i) {
-		if (value < 1)
-		  value = 1
-		if (value > 10)
-		  value = 10
-	}
-
-	operator int() const {
-		return value;
-	}
-
-	tiny_int& operator+=(int i) {
-		// by assigning to *this instead of directly modifying value, the
-		// constructor is called and thus the check is enforced
-		*this = value + i;
-		return *this;
-	}
-
-	tiny_int& operator-=(int i) {
-		*this = value - i;
-		return *this;
-	}
-
-	tiny_int& operator*=(int i) {
-		*this = value * i;
-		return *this;
-	}
-
-	tiny_int& operator/=(int i)	{
-		*this = value / i;
-		return *this;
-	}
-
-	tiny_int& operator<<=(int i) {
-		*this = value << i;
-		return *this;
-	}
-
-	tiny_int& operator>>=(int i) {
-		*this = value >> i;
-		return *this;
-	}
-	tiny_int& operator&=(int i) {
-		*this = value & i;
-		return *this;
-	}
-
-	tiny_int& operator|=(int i) {
-		*this = value | i;
-		return *this;
-	}
+		void doMagic() { printf("I put on my robe and wizard hat\n"); }
+		void wrathOfGod() { printf("OHHHHH SHHHHHHHH\n"); }
 
 	private:
-	unsigned char value; // we don't need more space
+		int hp, mp;
 };
-
-#endif
