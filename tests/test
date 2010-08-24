@@ -1,0 +1,18 @@
+#!/bin/sh
+
+CC2L=../cpptolua
+
+touch $2
+echo "Generating $*.cpp" >> $2
+if $CC2L -i $1.h >> $2 2>&1  ; then
+	echo "$1.cpp PASSED"
+else
+	echo "$1.cpp FAILED"
+fi
+
+echo "Generating $*.h" >> $2
+if $CC2L -i $1.h -H >> $2 2>&1  ; then
+	echo "$1.h PASSED"
+else
+	echo "$1.h FAILED"
+fi
