@@ -1,4 +1,4 @@
-TESTS = inline operators return_classes simple
+TESTS = inline operators return_classes simple cppstl
 
 tests: $(TESTS)
 
