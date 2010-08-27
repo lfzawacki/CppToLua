@@ -7,10 +7,8 @@ CC = g++
 .PHONY: tests clean all
 
 all: $(PROG)
-	#./$(PROG) < in.cpp
-	#./$(PROG) < player.h
 
-tests:
+tests: $(PROG)
 	cd tests/ ; make
 
 $(PROG): y.tab.c lex.yy.c
