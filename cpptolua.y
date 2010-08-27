@@ -121,7 +121,7 @@ class:
 
 				if (!global_make_header) {
 
-					printf("\n{\n\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
+					printf("\n{\n\t%s *c = *(%s**) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 
 					for(int j=0; j<$5->vi[i].param.size(); j++)
 					{			;
@@ -382,8 +382,8 @@ void writeFunctionNames()
 
 		if (!global_make_header) {
 			printf("const struct luaL_reg %slib [] = {\n",c);
-    	printf("\t{\"new\", %s_new },\n",c);
-    	printf("\t%s\n};\n\n",nullnull);
+    		printf("\t{\"new\", %s_new },\n",c);
+    		printf("\t%s\n};\n\n",nullnull);
 
 			printf("static const luaL_reg %s_meta[] = {\n",c);
 
@@ -392,7 +392,7 @@ void writeFunctionNames()
 			for (i = fn.begin(); i != fn.end(); i++ ) {
 		    printf("\t{ \"%s\" , %s_%s },\n", i->c_str(), c,i->c_str() );
 			}
-
+			printf("\t{\"__gc\", %s_gc },\n",c);
 			printf("\t%s\n};\n\n",nullnull);
 
 		}
@@ -448,20 +448,27 @@ void writeConstructor(string className)
 	printf( "int %s_new(lua_State* L)",cnc);
 
 	if (!global_make_header) {
-		printf( "\{\n\tsize_t size = sizeof(%s);\n\
-\t%s *p = (%s*) lua_newuserdata(L, size);\n\
-\tluaL_getmetatable(L, \"%s\");\n\
-\tlua_setmetatable(L, -2);\n\
-}\n",cnc,cnc,cnc,cnc);
-
-//		printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
-//		printf( "\tlua_pushlightuserdata(L,p);\n");
-//		printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
-//		printf( "\tlua_setmetatable(L, -2);\n");
-//		printf( "\treturn 1;\n}\n\n");
+		printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
+		printf( "\t%s **q = (%s**) lua_newuserdata(L, sizeof p );\n",cnc);
+		printf( "\t*q = p;" );
+		printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
+		printf( "\tlua_setmetatable(L, -2);\n");
+		printf( "\treturn 1;\n}\n\n");
 	} else {
 		printf(";\n");
 	}
+
+	printf( "int %s_gc(lua_State* L)",cnc);
+
+	if (!global_make_header) {
+		printf( "\n{\n\tprintf(\"Destroyed this sh1t\\n\");");
+		printf( "\t%s **p = (%s**) lua_touserdata(L,1);\n",cnc);
+		printf( "\tif (*p) delete *p;\n");
+		printf( "\treturn 0;\n}\n\n" );
+	} else {
+		printf(";\n");
+	}
+
 
 }
 
