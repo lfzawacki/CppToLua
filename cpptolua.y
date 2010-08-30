@@ -433,8 +433,11 @@ void writeTypePush(string type)
 		printf("lua_pushstring(L, ");
 	else if (type == "void")
 		printf("");
-	else //if(type == "double" || typenume == "int" || type == "float")
+	else if(type == "double" || typenume == "int" || type == "float")
 		printf("lua_pushnumber(L, ");
+	else //if (type == "UserDefinedClass" )
+		//push userdatum
+		printf("");
 
 	//problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
 	//devem ser tratadas com pushlightuserdata. Como fazer????
@@ -450,7 +453,7 @@ void writeConstructor(string className)
 	if (!global_make_header) {
 		printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
 		printf( "\t%s **q = (%s**) lua_newuserdata(L, sizeof p );\n",cnc);
-		printf( "\t*q = p;" );
+		printf( "\t*q = p;\n" );
 		printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
 		printf( "\tlua_setmetatable(L, -2);\n");
 		printf( "\treturn 1;\n}\n\n");
@@ -461,8 +464,7 @@ void writeConstructor(string className)
 	printf( "int %s_gc(lua_State* L)",cnc);
 
 	if (!global_make_header) {
-		printf( "\n{\n\tprintf(\"Destroyed this sh1t\\n\");");
-		printf( "\t%s **p = (%s**) lua_touserdata(L,1);\n",cnc);
+		printf( "\n{\n\t%s **p = (%s**) lua_touserdata(L,1);\n",cnc);
 		printf( "\tif (*p) delete *p;\n");
 		printf( "\treturn 0;\n}\n\n" );
 	} else {
