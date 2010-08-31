@@ -433,7 +433,7 @@ void writeTypePush(string type)
 		printf("lua_pushstring(L, ");
 	else if (type == "void")
 		printf("");
-	else if(type == "double" || typenume == "int" || type == "float")
+	else if(type == "double" || type == "int" || type == "float")
 		printf("lua_pushnumber(L, ");
 	else //if (type == "UserDefinedClass" )
 		//push userdatum

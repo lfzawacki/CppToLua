@@ -19,8 +19,12 @@
 	return *yytext;
 }
 
+    /* pointer */
+
+"*" { return ('*'); }
 
 	/* identifiers */
+
 [a-zA-Z_0-9~>&=]+ {
 #ifdef DEBUG
 	printf(": %s\n", yytext);
@@ -30,12 +34,16 @@
 }
 
 	/* skip whitespace */
+
 [ \t\n\r]+ ;
 
 	/* skip comments */
+
 \/\/.* ;
 \/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/ ;
+	
 	/* ^#[^i].*$ ;*/
+
 ^#.*$ ;
 ^using.*$ ;
 
