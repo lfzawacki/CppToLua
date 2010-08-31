@@ -16,6 +16,10 @@ int Cat::makeCake()
 	return 2*pancakeMix + 10;
 }
 
+void Cat::formatCat(char* lol) {
+	return "caturday";
+}
+
 void Cat::meow()
 {
 	printf("meow\n");

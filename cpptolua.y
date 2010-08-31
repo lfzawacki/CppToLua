@@ -127,8 +127,23 @@ class:
 					{			;
 						string paramType = $5->vi[i].param[j].type;
 						string paramName = $5->vi[i].param[j].name;
-						if(paramType=="int" || paramType=="float" || paramType=="double")
+						
+						if(paramType=="char" || paramType == "int" 
+						|| paramType=="float" || paramType=="double") {
+
 							printf("\t%s %s = luaL_checknumber(L, %d);\n", paramType.c_str(), paramName.c_str(), j+2);
+						} else 	if (paramType == "char*") {
+							printf("push a string\n");							
+							continue;
+							//a string
+						} else {
+							printf("push a %s",paramType.c_str());						
+						}
+												
+//						if (paramType == "class") {
+//							continue;
+//						}
+							
 					}
 
 					printf("\t");
@@ -436,8 +451,9 @@ void writeTypePush(string type)
 	else if(type == "double" || type == "int" || type == "float")
 		printf("lua_pushnumber(L, ");
 	else //if (type == "UserDefinedClass" )
-		//push userdatum
-		printf("");
+		printf("lua_pushlightuserdata(L, &"); // push the address of the variable
+											// as a userdatum
+		//printf("");
 
 	//problema: enums devem ser tratados com pushnumber mas classes definidas pelo usuário
 	//devem ser tratadas com pushlightuserdata. Como fazer????

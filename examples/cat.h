@@ -17,6 +17,8 @@ class Cat
 		void query();
 		void sleep();
 
+		void formatCat(char*);
+
 		void setPancakeMix(int pan);
 		int getPancakeMix();
 
