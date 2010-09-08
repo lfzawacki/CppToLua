@@ -20,9 +20,10 @@ y.tab.c: $(PROG).y
 lex.yy.c: $(PROG).l
 	lex $<
 
-%_userdata: %.h
-	./$(PROG) -i $< -o $@.cpp
-	./$(PROG) -i $< -o $@.h -H
+#example of how you should do it
+#%_userdata: %.h
+#	./$(PROG) -i $< -o $@.cpp
+#	./$(PROG) -i $< -o $@.h -H
 
 clean:
 	rm -f *~ y.tab.? lex.yy.c
