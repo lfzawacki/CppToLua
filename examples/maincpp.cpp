@@ -1,10 +1,13 @@
-#include <iostream>
-
 #include "lynx.h"
 
 int main()
 {
-	Lynx l;
+	Lynx *l = (Lynx*) malloc(sizeof(Lynx));
 
-	l.checkFightPower();
+	//testing placement new
+	new (l) Lynx();	
+
+	l->checkFightPower();
+
+	delete l;
 }

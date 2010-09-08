@@ -1,6 +1,6 @@
 #include "lynx.h"
 
-Lynx::Lynx()
+Lynx::Lynx() : fightPower(9000)
 {
 
 }

@@ -121,7 +121,7 @@ class:
 
 				if (!global_make_header) {
 
-					printf("\n{\n\t%s *c = *(%s**) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
+					printf("\n{\n\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 
 					for(int j=0; j<$5->vi[i].param.size(); j++)
 					{			;
@@ -466,13 +466,16 @@ void writeConstructor(string className)
 
 	printf( "int %s_new(lua_State* L)",cnc);
 
+
+
 	if (!global_make_header) {
-		printf( "\n{\n\t%s *p = new %s();\n",cnc,cnc);
-		printf( "\t%s **q = (%s**) lua_newuserdata(L, sizeof p );\n",cnc);
-		printf( "\t*q = p;\n" );
+		printf( "{\n\tsize_t size = sizeof(%s);\n",cnc);
+		printf( "\t%s *p = (%s*) lua_newuserdata(L, size);\n",cnc,cnc);
+		printf( "\tnew (p) %s();",cnc);
 		printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
 		printf( "\tlua_setmetatable(L, -2);\n");
-		printf( "\treturn 1;\n}\n\n");
+		printf( "\treturn 1;\n}\n");
+
 	} else {
 		printf(";\n");
 	}
@@ -480,7 +483,7 @@ void writeConstructor(string className)
 	printf( "int %s_gc(lua_State* L)",cnc);
 
 	if (!global_make_header) {
-		printf( "\n{\n\t%s **p = (%s**) lua_touserdata(L,1);\n",cnc);
+		printf( "\n{\n\t%s *p = (%s*) lua_touserdata(L,1);\n",cnc);
 		printf( "\tif (*p) delete *p;\n");
 		printf( "\treturn 0;\n}\n\n" );
 	} else {
