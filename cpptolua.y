@@ -124,7 +124,7 @@ class:
 					printf("\n{\n\t%s *c = (%s*) lua_touserdata(L, 1);\n", className.c_str(), className.c_str());
 
 					for(int j=0; j<$5->vi[i].param.size(); j++)
-					{			;
+					{			
 						string paramType = $5->vi[i].param[j].type;
 						string paramName = $5->vi[i].param[j].name;
 						
@@ -435,7 +435,8 @@ void writeHeaders(string className)
 		printf("\n}\n\n");
 
 	} else {
-			printf("#include \"%s\"\n\n",global_header_name.c_str());
+			printf( "#include \"%s\"\n",global_header_name.c_str());
+			printf( "#include <new>\n\n");
 	}
 
 }
@@ -483,8 +484,8 @@ void writeConstructor(string className)
 	printf( "int %s_gc(lua_State* L)",cnc);
 
 	if (!global_make_header) {
-		printf( "\n{\n\t%s *p = (%s*) lua_touserdata(L,1);\n",cnc);
-		printf( "\tif (*p) delete *p;\n");
+		printf( "\n{\n\t%s *p = (%s*) lua_touserdata(L,1);\n",cnc,cnc);
+		printf( "\tif (p) delete p;\n");
 		printf( "\treturn 0;\n}\n\n" );
 	} else {
 		printf(";\n");
