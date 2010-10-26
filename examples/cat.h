@@ -23,6 +23,9 @@ class Cat
 		void damage(int d);
 		void magic();
 
+		//const char* toString();
+		Cat multiply();
+		
 	private:
 		int pancakeMix;
 		int hp, mp;

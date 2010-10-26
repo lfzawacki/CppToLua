@@ -52,3 +52,8 @@ void Cat::magic()
 {
 	printf("poof\n");
 }
+
+Cat Cat::multiply()
+{
+	return *this;
+}

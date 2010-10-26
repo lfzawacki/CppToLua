@@ -371,11 +371,11 @@ void writeUtilityFunctions()
 
 		//Class* copyClass(lua_State *L, int index)
 		//Utility to make a bitwise copy of an userdata at index
-		printf("%s* copy%s(lua_State *L, int index)",c,c);
+		printf("int copy%s(lua_State *L, %s *p)",c,c);
 		if (!global_make_header) {
-			printf("\n{\n\tDog_new(L);\n",c);
-			printf("\tmemcpy(lua_touserdata(L,-1),lua_touserdata(L,-2), sizeof(%s));\n",c);
-			printf("\treturn lua_touserdata(L,-1);\n}\n\n");
+			printf("\n{\n\t%s_new(L);\n",c);
+			printf("\t*((%s*)lua_touserdata(L,-1)) = *(p);\n",c);
+			printf("\treturn 1;\n}\n\n");
 		} else {
 			printf(";\n");
 		}
@@ -419,7 +419,7 @@ void writeFunctionNames()
 			vector<string>& fn = global_function_names;
 			vector<string>::iterator i;
 			for (i = fn.begin(); i != fn.end(); i++ ) {
-		    printf("\t{ \"%s\" , %s_%s },\n", i->c_str(), c,i->c_str() );
+		    	printf("\t{ \"%s\" , %s_%s },\n", i->c_str(), c,i->c_str() );
 			}
 			printf("\t{\"__gc\", %s_gc },\n",c);
 			printf("\t%s\n};\n\n",nullnull);
@@ -466,7 +466,7 @@ void writeTypePush(string type)
 	else if(type == "double" || type == "int" || type == "float")
 		printf("lua_pushnumber(L, ");
 	else //if (type == "UserDefinedClass" )
-		printf("copy%s(L, ",type.c_str());		
+		printf("copy%s(L, &",type.c_str());		
 		//printf("lua_pushlightuserdata(L, &"); // push the address of the variable
 											// as a userdatum
 		//printf("");
