@@ -21,6 +21,7 @@ void writeFunctionNames();
 void writeHeaders(string className) ;
 void writeTypePush(string type);
 void writeConstructor(string className);
+string checkType(string type);
 
 string makeVariableName(string type, int index)
 {
@@ -106,12 +107,12 @@ class:
 				}
 
 				if (fooName.substr(0, strlen("operator")) == "operator") {
-					/*caso seja um operator*/
+					/* maybe we can use metamethods for this */
 					continue;
 				}
 
 				if (!$5->vi[i].isPublic) {
-					/* caso nao seja publico */
+					/* shouldn't be exposed */
 					continue;
 				}
 
@@ -128,18 +129,21 @@ class:
 						string paramType = $5->vi[i].param[j].type;
 						string paramName = $5->vi[i].param[j].name;
 						
-						if(paramType=="char" || paramType == "int" 
-						|| paramType=="float" || paramType=="double") {
-
-							printf("\t%s %s = luaL_checknumber(L, %d);\n", paramType.c_str(), paramName.c_str(), j+2);
-						} else 	if (paramType == "char*") {
-							printf("push a string\n");							
-							continue;
-							//a string
+						string checked = checkType(paramType);
+						if ( checked != paramType) {
+							printf("\t%s *%s = check%s(L, %d);\n", 
+							checked.c_str(), 
+							paramName.c_str(), 
+							checked.c_str() , 
+							j+2);
 						} else {
-							printf("push a %s",paramType.c_str());						
+							printf("\t%s %s = luaL_check%s(L, %d);\n", 
+							paramType.c_str(), 
+							paramName.c_str(), 
+							checked.c_str(), 
+							j+2);
 						}
-												
+						
 //						if (paramType == "class") {
 //							continue;
 //						}
@@ -247,7 +251,6 @@ function:
 				for(int i=0; i<$3->vvs.size(); i++)
 				{
 					Idf p;
-
 
 					p.type = $3->vvs[i][0];
 					p.name = makeVariableName(p.type,i);
@@ -366,6 +369,18 @@ void writeUtilityFunctions()
 			printf(";\n");
 		}
 
+		//Class* copyClass(lua_State *L, int index)
+		//Utility to make a bitwise copy of an userdata at index
+		printf("%s* copy%s(lua_State *L, int index)",c,c);
+		if (!global_make_header) {
+			printf("\n{\n\t%s *p = lua_touserdata(L,index);\n",c);
+			printf("\t%s *q = lua_newuserdata(L,sizeof(%s));\n",c,c);
+			printf("\tmemcpy(q,p,sizeof(%s));\n",c);
+			printf("\treturn q;\n}\n\n");
+		} else {
+			printf(";\n");
+		}
+
 		//int luaopen_Class(lua_State *L)
 		//Function to open the library
 		printf("int luaopen_%s(lua_State *L)",c);
@@ -461,18 +476,32 @@ void writeTypePush(string type)
 
 }
 
+string checkType(string type)
+{
+
+	if( type=="char"  || type == "int" || 
+	    type=="float" || type=="double")
+		return "number";
+
+	if ( type == "bool")
+		return "boolean";
+
+	if (type == "char*")
+		return "string";
+
+	return type;			
+}
+
 void writeConstructor(string className)
 {
 	const char* cnc = className.c_str();
 
 	printf( "int %s_new(lua_State* L)",cnc);
 
-
-
 	if (!global_make_header) {
-		printf( "{\n\tsize_t size = sizeof(%s);\n",cnc);
+		printf( "\n{\n\tsize_t size = sizeof(%s);\n",cnc);
 		printf( "\t%s *p = (%s*) lua_newuserdata(L, size);\n",cnc,cnc);
-		printf( "\tnew (p) %s();",cnc);
+		printf( "\tnew (p) %s();\n",cnc);
 		printf( "\tluaL_getmetatable(L, \"%s\");\n",cnc);
 		printf( "\tlua_setmetatable(L, -2);\n");
 		printf( "\treturn 1;\n}\n");

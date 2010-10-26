@@ -6,7 +6,9 @@
 	void yyerror(char *);
 	int idf(char *s);
 //#define DEBUG
+
 %}
+
 
 %%
 
@@ -19,16 +21,16 @@
 	return *yytext;
 }
 
-    /* pointer */
+	/* pointer */
 
-"*" { return ('*'); }
+"*"		;
 
 	/* identifiers */
 
 [a-zA-Z_0-9~>&=]+ {
 #ifdef DEBUG
 	printf(": %s\n", yytext);
-	//printf("idf: %i\n", idf(yytext));
+	printf("idf: %i\n", idf(yytext));
 #endif
 	return idf(yytext);
 }
@@ -43,6 +45,7 @@
 \/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/ ;
 	
 	/* ^#[^i].*$ ;*/
+	/* include files and using directives */
 
 ^#.*$ ;
 ^using.*$ ;
@@ -69,6 +72,9 @@ int idf(char *s)
 
 	char types[][99] = {"public", "private", "protected", ""};
 	int i;
+	
+	// here we check if we're parsing public members
+	// only those will be exposed to the lua scripts
 	for(i = 0; types[i][0]; i++) {
 		if(!strcmp(types[i], s)) {
 			if(i == 0) { //public index on types vector
