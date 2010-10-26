@@ -10,8 +10,9 @@ class Dog
 		void bark();
 		void mate(Dog other);
 		Dog giveBirth();
-
+		Dog divideFood(Dog a, int food);
 	private:
+		int hp,mp;
 
 };
 

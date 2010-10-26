@@ -130,7 +130,7 @@ class:
 						string paramName = $5->vi[i].param[j].name;
 						
 						string checked = checkType(paramType);
-						if ( checked != paramType) {
+						if ( checked == paramType) {
 							printf("\t%s *%s = check%s(L, %d);\n", 
 							checked.c_str(), 
 							paramName.c_str(), 
