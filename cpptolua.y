@@ -294,6 +294,7 @@ void displayUsage()
 	printf("\tusage: ./cpptolua [.h file] <options>\n");
 	printf("\t-i Specifies input file, reads from stdin if not present\n");
 	printf("\t-o Specifies output file, writes to stdout if not present\n");
+	printf("\t-e Specifies error log file, defaults to stderr\n");
 	printf("\t-H Tells cpptolua to make a header file instead of a .cpp\n");
 	printf("\t-n Sets the name of the file to be included in the .cpp\n");
 	printf("\t-N Sets the name of the file to be included in the header.\n\t(Only necessary if reading from stdin)\n");
@@ -304,7 +305,7 @@ void parseOptions(int argc, char **argv)
 {
 	char ch;
 
-	while((ch = getopt(argc, argv, "hHi:o:n:N:")) != EOF) {
+	while((ch = getopt(argc, argv, "hHi:o:n:N:e:")) != EOF) {
 		switch(ch) {
 			//display help
 			case 'h':
@@ -334,6 +335,9 @@ void parseOptions(int argc, char **argv)
 				break;
 			case 'N':
 				global_file_name = optarg;
+				break;
+			case 'e':
+				freopen(optarg,"w",stderr);
 				break;
 		}
 	}
@@ -463,7 +467,7 @@ void writeTypePush(string type)
 		printf("lua_pushstring(L, ");
 	else if (type == "void")
 		printf("");
-	else if(type == "double" || type == "int" || type == "float")
+	else if(type == "char" || type == "double" || type == "int" || type == "float")
 		printf("lua_pushnumber(L, ");
 	else //if (type == "UserDefinedClass" )
 		printf("copy%s(L, &",type.c_str());		
