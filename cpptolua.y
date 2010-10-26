@@ -373,10 +373,9 @@ void writeUtilityFunctions()
 		//Utility to make a bitwise copy of an userdata at index
 		printf("%s* copy%s(lua_State *L, int index)",c,c);
 		if (!global_make_header) {
-			printf("\n{\n\t%s *p = lua_touserdata(L,index);\n",c);
-			printf("\t%s *q = lua_newuserdata(L,sizeof(%s));\n",c,c);
-			printf("\tmemcpy(q,p,sizeof(%s));\n",c);
-			printf("\treturn q;\n}\n\n");
+			printf("\n{\n\tDog_new(L);\n",c);
+			printf("\tmemcpy(lua_touserdata(L,-1),lua_touserdata(L,-2), sizeof(%s));\n",c);
+			printf("\treturn lua_touserdata(L,-1);\n}\n\n");
 		} else {
 			printf(";\n");
 		}
@@ -467,7 +466,8 @@ void writeTypePush(string type)
 	else if(type == "double" || type == "int" || type == "float")
 		printf("lua_pushnumber(L, ");
 	else //if (type == "UserDefinedClass" )
-		printf("lua_pushlightuserdata(L, &"); // push the address of the variable
+		printf("copy%s(L, ",type.c_str());		
+		//printf("lua_pushlightuserdata(L, &"); // push the address of the variable
 											// as a userdatum
 		//printf("");
 
