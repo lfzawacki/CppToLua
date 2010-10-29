@@ -59,7 +59,7 @@ vector<string> global_function_names;
 
 %token <sv> IDF
 %token CLASS VISIBILITY
-%type <sv> idf_list idf_list_opt
+%type <sv> idf idf_list idf_list_opt
 %type <svv> idf_comma_list idf_comma_list_opt
 %type <i> function
 %type <n> class_body
@@ -228,8 +228,13 @@ idf_list_opt:
 			;
 
 idf_list:
-			idf_list IDF    { $$ = $1; $$->vs.push_back($2->vs[0]); }
-			| IDF           { $$ = $1; }
+			idf_list idf    { $$ = $1; $$->vs.push_back($2->vs[0]); }
+			| idf           { $$ = $1; }
+			;
+
+idf:
+			idf '*'	{ $$ = $1; /*$$->vs[0] = $$->vs[0] + "*";*/ }
+			| IDF	{ $$ = $1; }
 			;
 
 function:
@@ -254,8 +259,7 @@ function:
 
 					p.type = $3->vvs[i][0];
 					p.name = makeVariableName(p.type,i);
-					//p.name = $3->vvs[i][$3->vvs[i].size()-1];
-
+					
 					vp.push_back(p);
 				}
 

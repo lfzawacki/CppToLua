@@ -21,9 +21,7 @@
 	return *yytext;
 }
 
-	/* pointer */
-
-"*"		;
+"*"	{	return '*';	}
 
 	/* identifiers */
 
