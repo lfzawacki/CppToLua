@@ -23,6 +23,9 @@
 
 "*"	{	return '*';	}
 
+"const" ;
+"&" ;
+
 	/* identifiers */
 
 [a-zA-Z_0-9~>&=]+ {
