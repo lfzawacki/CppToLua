@@ -25,8 +25,18 @@ string checkType(string type);
 
 string makeVariableName(string type, int index)
 {
+	//is it a primitive type?
+	const char *primitive[] = {"int", "char", "float", "double"};
+	bool isPrimitive = true;
+
+	for (int i=0; i < sizeof primitive; i++) {
+		isPrimitive = isPrimitive && type == primitive[i]; 
+	}
+
 	char *buffer = (char*) malloc( sizeof type.c_str() + sizeof "just_a_" + sizeof "_00" );
-	sprintf(buffer,"just_a_%s_%01d" , type.c_str(), index );
+	//the first %s is a hack...
+	//when it's not primitive it's a pointer so we dereference it	
+	sprintf(buffer,"%sjust_a_%s_%01d" , isPrimitive ? "" : "*" , type.c_str(), index );
 	string ret = buffer;
 	free(buffer);
 	return ret;
@@ -131,7 +141,7 @@ class:
 						
 						string checked = checkType(paramType);
 						if ( checked == paramType) {
-							printf("\t%s *%s = check%s(L, %d);\n", 
+							printf("\t%s %s = check%s(L, %d);\n", 
 							checked.c_str(), 
 							paramName.c_str(), 
 							checked.c_str() , 
