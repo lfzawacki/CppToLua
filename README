@@ -1,14 +1,10 @@
 A solution to parse your cpp classes and generate instant bindings for them to be
 manipulated inside Lua scripts
 
-Under development, it barely works
+PROJECT FORSAKEN
 
-Version 0.2 out!
+Links that might be of interest
 
------------
-
-problemas: herdar metodos de outras classes							 DONE
-           nao deve pegar metodos private ou protected						 DONE
-           tratar tipos com mais de uma palavra (char *)
-	   tratar retorno de tipo composto (classe, diferenciar de enum)
-	   quando o método tiver a palavra operator e nao for um operatorX() ele vai ignorar	 DONE
+SWIG - http://www.swig.org/Doc1.3/Lua.html
+tolua++ - http://www.codenix.com/~tolua/
+Luabind - https://github.com/LuaDist/luabind

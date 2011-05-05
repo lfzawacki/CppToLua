@@ -27,10 +27,10 @@ string makeVariableName(string type, int index)
 {
 	//is it a primitive type?
 	const char *primitive[] = {"int", "char", "float", "double"};
-	bool isPrimitive = true;
+	bool isPrimitive = false;
 
 	for (int i=0; i < sizeof primitive; i++) {
-		isPrimitive = isPrimitive && type == primitive[i]; 
+		isPrimitive = isPrimitive || type == primitive[i]; 
 	}
 
 	char *buffer = (char*) malloc( sizeof type.c_str() + sizeof "just_a_" + sizeof "_00" );
